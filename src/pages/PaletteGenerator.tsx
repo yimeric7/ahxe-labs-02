@@ -3,7 +3,7 @@ import * as React from "react";
 import { useState, useEffect, ChangeEvent } from "react";
 import { Link } from "react-router-dom";
 import { db } from "../firebase/init";
-import { useAuth } from "../firebase/AuthContext"
+import { useAuth } from "../firebase/AuthContext";
 import { collection, addDoc } from "@firebase/firestore";
 
 interface HSL {
@@ -55,7 +55,7 @@ export default function PaletteGenerator() {
         console.error("User not authenticated.");
         return;
       }
-      
+
       await addDoc(collection(db, "users", currentUser.uid, "palettes"), {
         name: name,
         palette: palette,
@@ -63,7 +63,7 @@ export default function PaletteGenerator() {
     } catch (error) {
       console.error("Error saving palette:", error);
     }
-  }
+  };
 
   return (
     <div

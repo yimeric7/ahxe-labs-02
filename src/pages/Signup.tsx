@@ -31,15 +31,16 @@ export default function Signup() {
 
   return (
     <div
-    style={{
+      style={{
         display: "flex",
         flexDirection: "column",
         alignItems: "start",
         padding: "0 15px 15px 15px",
         height: "100%",
         gap: "20px",
-      }}>
-        <button onClick={()=> navigate('/')}>Back</button>
+      }}
+    >
+      <button onClick={() => navigate("/")}>Back</button>
       <strong>Sign Up</strong>
 
       {error && (

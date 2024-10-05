@@ -47,15 +47,18 @@ export default function FavoritePalettes() {
     fetchPalettes();
   }, [currentUser, db]);
 
-  const handleAddColorStyles = async (name: string, palette: PaletteColor[]): Promise<void> => {
-  // Loop through the palette and create a color style for each shade
-  for (const { shade, color } of palette) {
-    await framer.createColorStyle({
-      name: `${name}-${shade}`, // e.g., #3366FF-50
-      light: color,
-    });
-  }
-};
+  const handleAddColorStyles = async (
+    name: string,
+    palette: PaletteColor[]
+  ): Promise<void> => {
+    // Loop through the palette and create a color style for each shade
+    for (const { shade, color } of palette) {
+      await framer.createColorStyle({
+        name: `${name}-${shade}`, // e.g., #3366FF-50
+        light: color,
+      });
+    }
+  };
 
   return (
     <div
@@ -99,7 +102,9 @@ export default function FavoritePalettes() {
                     </div>
                   ))}
                   <button
-                    onClick={() => handleAddColorStyles(palette.name, palette.palette)}
+                    onClick={() =>
+                      handleAddColorStyles(palette.name, palette.palette)
+                    }
                     style={{
                       height: "32px",
                       backgroundColor: "#FAFAFA",
