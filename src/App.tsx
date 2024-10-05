@@ -1,46 +1,246 @@
-import { framer, CanvasNode } from "framer-plugin"
-import { useState, useEffect } from "react"
-import "./App.css"
+import { framer, CanvasNode } from "framer-plugin";
+import { useState, useEffect, ChangeEvent } from "react";
+import "./App.css";
 
 framer.showUI({
-    position: "top right",
-    width: 240,
-    height: 95,
-})
+  position: "top right",
+  width: 240,
+  height: 95,
+  resizable: true,
+});
 
-function useSelection() {
-    const [selection, setSelection] = useState<CanvasNode[]>([])
-
-    useEffect(() => {
-        return framer.subscribeToSelection(setSelection)
-    }, [])
-
-    return selection
+interface HSL {
+  h: number;
+  s: number;
+  l: number;
 }
 
 export function App() {
-    const selection = useSelection()
-    const layer = selection.length === 1 ? "layer" : "layers"
+  const [name, setName] = useState<string>("white"); // New state for palette name
+  const [hexCode, setHexCode] = useState<string>("#FAFAFA");
+  const [palette, setPalette] = useState<{ shade: number; color: string }[]>([]);
 
-    const handleAddSvg = async () => {
-        await framer.addSVG({
-            svg: `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24"><path fill="#999" d="M20 0v8h-8L4 0ZM4 8h8l8 8h-8v8l-8-8Z"/></svg>`,
-            name: "Logo.svg",
-        })
+  // Use useEffect to generate the palette whenever hexCode changes
+  useEffect(() => {
+    if (isValidHex(hexCode)) {
+      const generatedPalette = generatePalette(hexCode);
+      setPalette(generatedPalette);
+    } else {
+      setPalette([]);
+    }
+  }, [hexCode]);
+
+  // Handle input change
+  const handleInputChange = (e: ChangeEvent<HTMLInputElement>): void => {
+    const value = e.target.value;
+    setHexCode(value);
+  };
+
+  // Handle input change for the palette name
+  const handleNameChange = (e: ChangeEvent<HTMLInputElement>): void => {
+    const value = e.target.value;
+    setName(value);
+  };
+    
+
+  // Validate hex code
+  const isValidHex = (hex: string): boolean => {
+    return /^#([0-9A-F]{3}){1,2}$/i.test(hex);
+  };
+
+  // Tailwind-like shade values including 950
+  const TAILWIND_SHADES = [50, 100, 200, 300, 400, 500, 600, 700, 800, 900, 950];
+
+  // Tailwind-like lightness values corresponding to the shades (50 to 950)
+  const TAILWIND_LIGHTNESS = [95, 90, 80, 70, 60, 50, 40, 30, 20, 10, 5];
+
+  // Generate palette using predefined Tailwind-like steps
+  const generatePalette = (baseHex: string): { shade: number; color: string }[] => {
+    const shades: { shade: number; color: string }[] = [];
+    const baseHSL = hexToHsl(baseHex);
+
+    // Generate colors based on Tailwind-like steps
+    TAILWIND_SHADES.forEach((shade, index) => {
+      const lightness = TAILWIND_LIGHTNESS[index];
+      const newHex = hslToHex(baseHSL.h, baseHSL.s, lightness);
+      shades.push({ shade, color: newHex });
+    });
+
+    return shades;
+  };
+
+  // Convert hex to HSL
+  const hexToHsl = (H: string): HSL => {
+    let r: number, g: number, b: number;
+    H = H.replace("#", "");
+
+    if (H.length === 3) {
+      H = H.split("").map((h) => h + h).join("");
     }
 
+    r = parseInt(H.substring(0, 2), 16) / 255;
+    g = parseInt(H.substring(2, 4), 16) / 255;
+    b = parseInt(H.substring(4, 6), 16) / 255;
+
+    const max = Math.max(r, g, b),
+      min = Math.min(r, g, b);
+    let h: number = 0,
+      s: number = 0,
+      l: number = (max + min) / 2;
+
+    if (max !== min) {
+      const d = max - min;
+      s = l > 0.5 ? d / (2 - max - min) : d / (max + min);
+
+      switch (max) {
+        case r:
+          h = (g - b) / d + (g < b ? 6 : 0);
+          break;
+        case g:
+          h = (b - r) / d + 2;
+          break;
+        case b:
+          h = (r - g) / d + 4;
+          break;
+      }
+
+      h *= 60;
+    }
+
+    return { h: Math.round(h), s: Math.round(s * 100), l: Math.round(l * 100) };
+  };
+
+  // Convert HSL to hex
+  const hslToHex = (h: number, s: number, l: number): string => {
+    s /= 100;
+    l /= 100;
+
+    const c = (1 - Math.abs(2 * l - 1)) * s;
+    const hPrime = h / 60;
+    const x = c * (1 - Math.abs((hPrime % 2) - 1));
+    const m = l - c / 2;
+    let r = 0,
+      g = 0,
+      b = 0;
+
+    if (0 <= hPrime && hPrime < 1) {
+      r = c;
+      g = x;
+    } else if (1 <= hPrime && hPrime < 2) {
+      r = x;
+      g = c;
+    } else if (2 <= hPrime && hPrime < 3) {
+      g = c;
+      b = x;
+    } else if (3 <= hPrime && hPrime < 4) {
+      g = x;
+      b = c;
+    } else if (4 <= hPrime && hPrime < 5) {
+      r = x;
+      b = c;
+    } else if (5 <= hPrime && hPrime < 6) {
+      r = c;
+      b = x;
+    }
+
+    r = Math.round((r + m) * 255);
+    g = Math.round((g + m) * 255);
+    b = Math.round((b + m) * 255);
+
+    return rgbToHex(r, g, b);
+  };
+
+  // Convert RGB to hex
+  const rgbToHex = (r: number, g: number, b: number): string => {
     return (
-        <main>
-            <p>
-                Welcome! Check out the{" "}
-                <a href="https://framer.com/developers/plugins/introduction" target="_blank">
-                    Docs
-                </a>{" "}
-                to start. You have {selection.length} {layer} selected.
-            </p>
-            <button className="framer-button-primary" onClick={handleAddSvg}>
-                Insert Logo
-            </button>
-        </main>
-    )
+      "#" +
+      [r, g, b]
+        .map((x) => {
+          const hex = x.toString(16);
+          return hex.length === 1 ? "0" + hex : hex;
+        })
+        .join("")
+    );
+  };
+
+  const handleAddColorStyles = async () => {
+    // Loop through the palette and create a color style for each shade
+    for (const { shade, color } of palette) {
+      await framer.createColorStyle({
+        name: `${name}-${shade}`, // e.g., #3366FF-50
+        light: color,
+      });
+    }
+  };
+  return (
+    <main>
+        <div style={{display: "flex", flexDirection: "column", gap: "8px"}}>
+            <div style={{display: "flex", flexDirection: "column", gap: "2px"}}>
+                <label style={{ fontSize: "12px", color: "#777" }}>Color</label>
+                <input
+                    type="text"
+                    value={name}
+                    onChange={handleNameChange}
+                />
+            </div>
+
+            <div style={{display: "flex", flexDirection: "column", gap: "2px"}}>
+                <label style={{ fontSize: "12px", color: "#777" }}>Hex Code</label>
+                <input
+                    type="text"
+                    value={hexCode}
+                    onChange={handleInputChange}
+                />
+            </div>
+        </div>
+        
+      
+      <div
+        style={{
+          display: "flex",
+          flexDirection: "column",
+          width: "100%",
+          height: "auto",
+          borderRadius: "16px",
+          borderRadius: "8px", // Add a large border radius
+          borderTopLeftRadius: "8px",
+          borderTopRightRadius: "8px",
+          borderBottomLeftRadius: "8px",
+          borderBottomRightRadius: "8px",
+          paddingBottom: "16px", 
+          overflow: "hidden", // Clip child elements to follow the border radius
+        }}
+      >
+        {palette.map(({ shade, color }, index) => (
+          <div
+            key={index}
+            style={{
+              backgroundColor: color,
+              width: "100%",
+              flex: 1, // Use flex to ensure equal height distribution
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              padding: "8px"
+            }}
+          >
+            {/* Small text box with #121315 background and #FAFAFA text */}
+            <span
+              style={{
+                padding: "0px 4px",
+                backgroundColor: "#121315",
+                color: "#FAFAFA",
+                borderRadius: "4px",
+              }}
+            >
+              {shade}
+            </span>
+          </div>
+        ))}
+      </div>
+
+
+        <button onClick={handleAddColorStyles} style={{eight: "32px", backgroundColor: "#FAFAFA", color: "#121315"}}>Add Color Palette</button>
+    </main>
+  );
 }
