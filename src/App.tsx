@@ -1,4 +1,4 @@
-import { framer, CanvasNode } from "framer-plugin";
+import { framer } from "framer-plugin";
 import { useState, useEffect, ChangeEvent } from "react";
 import "./App.css";
 
