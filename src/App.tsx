@@ -1,4 +1,4 @@
-import { framer, CanvasNode } from "framer-plugin";
+import { framer } from "framer-plugin";
 import { useState, useEffect, ChangeEvent } from "react";
 import "./App.css";
 
@@ -240,7 +240,7 @@ export function App() {
       </div>
 
 
-        <button onClick={handleAddColorStyles} style={{eight: "32px", backgroundColor: "#FAFAFA", color: "#121315"}}>Add Color Palette</button>
+      <button onClick={handleAddColorStyles} style={{height: "32px", backgroundColor: "#FAFAFA", color: "#121315"}}>Add Color Palette</button>
     </main>
   );
 }
