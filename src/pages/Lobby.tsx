@@ -12,9 +12,9 @@ export default function Lobby() {
         height: "100%",
         gap: "20px",
       }}>
-      <div>AHXE Labs Styles Lobby</div>
+      <div>AHXE Labs Lobby</div>
       <Link to="/profile">Profile</Link>
-      <Link to="/pallete">Palette</Link>
+      <Link to="/pallete">New Pallette</Link>
     </div>
   );
 }

@@ -12,7 +12,7 @@ export default function Home() {
         height: "100%",
         gap: "20px",
       }}>
-      <div>Welcome to AHXE Labs Styles</div>
+      <div>Welcome to AHXE Labs</div>
       <Link to="/login">Login</Link>
       <Link to="/signup">Signup</Link>
     </div>
