@@ -2,6 +2,9 @@ import { framer } from "framer-plugin";
 import * as React from "react";
 import { useState, useEffect, ChangeEvent } from "react";
 import { Link } from "react-router-dom";
+import { db } from "../firebase/init";
+import { useAuth } from "../firebase/AuthContext"
+import { collection, addDoc } from "@firebase/firestore";
 
 interface HSL {
   h: number;
@@ -10,6 +13,7 @@ interface HSL {
 }
 
 export default function PaletteGenerator() {
+  const { currentUser } = useAuth();
   const [name, setName] = useState<string>("white");
   const [hexCode, setHexCode] = useState<string>("#FAFAFA");
   const [palette, setPalette] = useState<{ shade: number; color: string }[]>(
@@ -44,6 +48,22 @@ export default function PaletteGenerator() {
       });
     }
   };
+
+  const handleSaveFavorites = async () => {
+    try {
+      if (!currentUser) {
+        console.error("User not authenticated.");
+        return;
+      }
+      
+      await addDoc(collection(db, "users", currentUser.uid, "palettes"), {
+        name: name,
+        palette: palette,
+      });
+    } catch (error) {
+      console.error("Error saving palette:", error);
+    }
+  }
 
   return (
     <div
@@ -117,10 +137,10 @@ export default function PaletteGenerator() {
         Add To Framer
       </button>
       <button
-        onClick={handleAddColorStyles}
+        onClick={handleSaveFavorites}
         style={{ height: "32px", backgroundColor: "#121315", color: "#FAFAFA" }}
       >
-        Save Palette
+        Save in Favorites
       </button>
     </div>
   );
