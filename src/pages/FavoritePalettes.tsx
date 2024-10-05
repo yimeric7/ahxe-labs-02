@@ -75,32 +75,55 @@ export default function FavoritePalettes() {
               <h4>{palette.name}</h4>
               {palette.palette && palette.palette.length > 0 ? (
                 <div>
-                  {palette.palette.map((colorItem) => (
-                    <div>
-                      <div
-                        style={{
-                          backgroundColor: colorItem.color,
-                          width: "100%",
-                          flex: 1,
-                          display: "flex",
-                          alignItems: "center",
-                          justifyContent: "center",
-                          padding: "8px",
-                        }}
-                      >
+                  <div
+                    style={{
+                      display: "flex",
+                      flexDirection: "row",
+                      width: "100%",
+                      height: "auto",
+                      paddingBottom: "16px",
+                      overflow: "hidden",
+                      gap: "4px",
+                    }}
+                  >
+                    {palette.palette.map((colorItem) => (
+                      <div>
                         <div
                           style={{
-                            padding: "0px 4px",
-                            backgroundColor: "#121315",
-                            color: "#FAFAFA",
-                            borderRadius: "4px",
+                            backgroundColor: colorItem.color,
+                            width: "100%",
+                            height: "70px",
+                            borderRadius: "8px",
+                            display: "flex",
+                            alignItems: "center",
+                            justifyContent: "center",
+                            padding: "8px",
                           }}
                         >
-                          {colorItem.shade}
+                          <div
+                            style={
+                              colorItem.shade < 600
+                                ? {
+                                    color: "#121315",
+                                    display: "flex",
+                                    flexDirection: "column",
+                                    alignItems: "center",
+                                  }
+                                : {
+                                    color: "#FAFAFA",
+                                    display: "flex",
+                                    flexDirection: "column",
+                                    alignItems: "center",
+                                  }
+                            }
+                          >
+                            <div>{colorItem.shade}</div>
+                            <div>{colorItem.color.slice(1)}</div>
+                          </div>
                         </div>
                       </div>
-                    </div>
-                  ))}
+                    ))}
+                  </div>
                   <button
                     onClick={() =>
                       handleAddColorStyles(palette.name, palette.palette)

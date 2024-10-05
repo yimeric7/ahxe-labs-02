@@ -92,15 +92,12 @@ export default function PaletteGenerator() {
       <div
         style={{
           display: "flex",
-          flexDirection: "column",
+          flexDirection: "row",
           width: "100%",
           height: "auto",
-          borderTopLeftRadius: "8px",
-          borderTopRightRadius: "8px",
-          borderBottomLeftRadius: "8px",
-          borderBottomRightRadius: "8px",
           paddingBottom: "16px",
           overflow: "hidden",
+          gap: "4px",
         }}
       >
         {palette.map(({ shade, color }, index) => (
@@ -109,23 +106,34 @@ export default function PaletteGenerator() {
             style={{
               backgroundColor: color,
               width: "100%",
-              flex: 1,
+              height: "70px",
+              borderRadius: "8px",
               display: "flex",
               alignItems: "center",
               justifyContent: "center",
               padding: "8px",
             }}
           >
-            <span
-              style={{
-                padding: "0px 4px",
-                backgroundColor: "#121315",
-                color: "#FAFAFA",
-                borderRadius: "4px",
-              }}
+            <div
+              style={
+                shade < 600
+                  ? {
+                      color: "#121315",
+                      display: "flex",
+                      flexDirection: "column",
+                      alignItems: "center",
+                    }
+                  : {
+                      color: "#FAFAFA",
+                      display: "flex",
+                      flexDirection: "column",
+                      alignItems: "center",
+                    }
+              }
             >
-              {shade}
-            </span>
+              <div>{shade}</div>
+              <div>{color.slice(1)}</div>
+            </div>
           </div>
         ))}
       </div>

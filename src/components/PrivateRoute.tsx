@@ -7,7 +7,7 @@ type PrivateRouteProps = {
 };
 
 export default function PrivateRoute({ children }: PrivateRouteProps) {
-    const { currentUser } = useAuth();
-  
-    return currentUser ? <>{children}</> : <Navigate to="/" replace />;
-  }
+  const { currentUser } = useAuth();
+
+  return currentUser ? <>{children}</> : <Navigate to="/" replace />;
+}

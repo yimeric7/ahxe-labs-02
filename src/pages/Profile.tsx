@@ -8,8 +8,8 @@ export default function Profile() {
 
   const handleLogout = async () => {
     try {
-      await logout(); // Execute the logout function
-      navigate("/"); // Navigate to the home page after logout
+      await logout();
+      navigate("/");
     } catch (error) {
       console.error("Failed to logout:", error);
     }
